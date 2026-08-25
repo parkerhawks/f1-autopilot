@@ -7,8 +7,8 @@ It learns any circuit the same way: you drive a handful of laps, it imitates
 them, then reinforcement learning takes over and tries to beat you.
 
 ```
-       your laps  ──►  behavioural cloning  ──►  SAC  ──►  faster laps
-                              (imitate)        (improve)
+    your laps  ->  behavioural cloning  ->  SAC  ->  faster laps
+                        (imitate)         (improve)
 ```
 
 **Results on Monza** (RTX 4070, ~14 h total training): complete laps at
@@ -26,8 +26,8 @@ chicanes, the Lesmos, Ascari and Parabolica.
 ## What makes this hard
 
 F1 25 is a closed commercial game. There is no `reset()`, no frame stepping, no
-time acceleration. Everything happens at 1× wall clock, and a crashed car has
-to be recovered through the pause menu like a human would. Almost every design
+time acceleration. Everything happens at 1x wall clock, and a crashed car has to
+be recovered through the pause menu like a human would. Almost every design
 decision here follows from that.
 
 | constraint | consequence |
@@ -43,7 +43,7 @@ decision here follows from that.
 ## How it works
 
 **Perception.** DXGI desktop duplication grabs the game window at 30 Hz. A
-cropped band of road is downsampled to 192×96 greyscale and stacked three deep.
+cropped band of road is downsampled to 192x96 greyscale and stacked three deep.
 
 **Proprioception.** The game's documented UDP telemetry gives speed, gear,
 g-forces, and — crucially — the controls it actually *applied*, which differ
@@ -63,7 +63,7 @@ steering to left/right/none makes the problem unlearnable.
 There is also a **simulator** (`f1ai/sim/`) — a bicycle model on a synthetic
 circuit that emits real-format UDP packets and renders a driver's-eye view. The
 whole pipeline is testable against it without owning the game, and it caught
-two bugs that would have been far more expensive to find at 1× realtime.
+bugs that would have been far more expensive to find at 1x realtime.
 
 Full tour: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
@@ -77,7 +77,7 @@ Full tour: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
   need the byte offsets re-verified; `tools/probe_telemetry.py` does that.
 - 16 GB RAM (a 150k-transition replay buffer is ~2.8 GB)
 
-```bash
+```powershell
 git clone https://github.com/<you>/f1-autopilot
 cd f1-autopilot
 python -m venv .venv
@@ -94,7 +94,7 @@ project cannot see, while `pip list` cheerfully shows it installed.
 
 Verify with no game running:
 
-```bash
+```powershell
 .venv\Scripts\python.exe tools\run_tests.py
 ```
 
@@ -112,7 +112,7 @@ Everything below works for any circuit — swap the `--track` name.
 |---|---|---|
 | Display | **borderless windowed** | exclusive fullscreen blocks capture |
 | Resolution | 1080p | halves preprocessing cost |
-| Frame cap | 30–60 | frames above your control rate just steal GPU from the learner |
+| Frame cap | 30-60 | frames above your control rate just steal GPU from the learner |
 | Motion blur | **off** | blur corrupts training frames |
 | Preset | low | simpler visuals help the CNN |
 | Camera | **TV Pod** or similar | a cockpit view spends half its pixels on the halo |
@@ -122,9 +122,15 @@ Play **offline, single-player Time Trial only**. See [Fair use](#fair-use).
 
 ### 2. Verify the game talks to us
 
-```bash
+```powershell
 .venv\Scripts\python.exe tools\probe_telemetry.py
+```
+
+```powershell
 .venv\Scripts\python.exe tools\probe_telemetry.py --decode
+```
+
+```powershell
 .venv\Scripts\python.exe tools\probe_telemetry.py --scan-floats 2 --scan-seconds 150
 ```
 
@@ -136,41 +142,52 @@ anything reads wrong, `--watch-bytes 2` reports which bytes change and when.
 
 ### 3. Check what the network sees
 
-```bash
+```powershell
 .venv\Scripts\python.exe tools\tune_crop.py --delay 12 --samples 5
 ```
 
-Open `docs/crop_tuning.png`. The crop must contain road with both edges
-visible and the vanishing point inside it — no wheel, no HUD, nothing outside
-the game window. **Do not skip this.** No amount of training fixes a camera
-pointed at the wrong thing.
+Open `docs/crop_tuning.png`. The crop must contain road with both edges visible
+and the vanishing point inside it — no wheel, no HUD, nothing outside the game
+window. **Do not skip this.** No amount of training fixes a camera pointed at
+the wrong thing.
 
 ### 4. Record laps and build the map
 
-```bash
+```powershell
 .venv\Scripts\python.exe tools\record_laps.py --laps 5
+```
+
+```powershell
 .venv\Scripts\python.exe tools\build_map.py demos\<session> --name silverstone
 ```
+
+That writes `maps\silverstone.npz`, which every later command finds via
+`--track silverstone`.
 
 Drive cleanly. The map becomes the definition of where the track is, so a lap
 that cuts a corner teaches the agent that cutting is correct.
 
 ### 5. Warm start, then reinforce
 
-```bash
+```powershell
 .venv\Scripts\python.exe tools\train_bc.py demos\<session> --track silverstone
+```
+
+```powershell
 .venv\Scripts\python.exe tools\check_bc.py runs\bc\bc.pt demos\<session>\<lap>.npz
 ```
 
-```bash
-.venv\Scripts\python.exe tools\train_sac.py --backend f1 --track silverstone ^
-    --init-from runs\bc\bc.pt --steps 600000 --batch 64 --name run1
+```powershell
+.venv\Scripts\python.exe tools\train_sac.py --backend f1 --track silverstone --init-from runs\bc\bc.pt --steps 600000 --batch 64 --name run1
 ```
 
 ### 6. Watch it drive
 
-```bash
+```powershell
 .venv\Scripts\python.exe tools\drive.py runs\run1\latest.pt --track silverstone --hud
+```
+
+```powershell
 .venv\Scripts\python.exe -m f1ai.hud.overlay
 ```
 
@@ -200,7 +217,7 @@ that cuts a corner teaches the agent that cutting is correct.
   enforcement. Expect the first strictly-legal laps to be slower.
 - **One track per map.** No cross-track generalisation is attempted; the policy
   learns a circuit.
-- **The game crashes.** Roughly every 5–6 hours in testing. Training suspends
+- **The game crashes.** Roughly every 5-6 hours in testing. Training suspends
   and resumes automatically, and checkpoints every 20k steps.
 - **Reset sequences are game-version specific.** The button paths in
   `f1ai/rl/f1_backend.py` are for F1 25 Time Trial. Verify with
