@@ -1,0 +1,31 @@
+# Training output. A single run's replay buffer is ~2.8 GB and the runs
+# directory reached 16 GB during development -- none of it belongs in git.
+runs/
+*.pt
+*.npz
+
+# Recorded human laps. ~25 MB per lap, and they are specific to one person's
+# driving on one track, so everyone generates their own.
+demos/
+
+# Track maps are built from your own recordings in about a minute.
+maps/
+
+# Generated figures and captures.
+docs/*.png
+docs/render_preview.png
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

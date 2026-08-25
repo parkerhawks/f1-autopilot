@@ -1,0 +1,25 @@
+# Core. Everything here runs against the built-in simulator with no game.
+numpy>=1.26
+opencv-python>=4.9
+pillow>=10.0
+matplotlib>=3.8
+
+# GPU. The CPU wheel works but training is impractically slow.
+# For CUDA, install from PyTorch's index instead:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+torch>=2.6
+torchvision
+
+# Windows screen capture (DXGI desktop duplication). Windows only.
+dxcam>=0.0.5
+
+# NOT INSTALLED HERE ON PURPOSE:
+#
+#   vgamepad
+#
+# It installs the ViGEmBus kernel driver and raises a UAC prompt, so it should
+# be a deliberate step rather than a side effect of a bulk install. It is only
+# needed to CONTROL the real game -- recording laps, the simulator, and the
+# whole test suite work without it.
+#
+#   .venv\Scripts\python.exe -m pip install vgamepad
