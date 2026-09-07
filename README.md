@@ -11,6 +11,28 @@ them, then reinforcement learning takes over and tries to beat you.
                         (imitate)         (improve)
 ```
 
+![One recorded lap: the frames fed to the network, the telemetry it reads, and the racing line built from the driver's own laps](docs/hero.png)
+
+Everything above is from one real recorded lap — the frames are the exact
+arrays the CNN was fed, the traces are the bytes the game sent, and the map was
+built from the driver's own laps rather than any game asset. Note what the
+network does *not* get: no HUD, no minimap, no track name, no position. Six
+frames of grey road, and the car's own telemetry.
+
+<img src="docs/hud.png" width="380" align="right" alt="Live overlay showing the network's camera view, lap-time history and training statistics">
+
+**The overlay** runs click-through and always-on-top over the game, so you can
+watch a policy while it trains: the frames it is seeing, its steering and pedal
+output, the lap-time trace, and the live training statistics.
+
+It runs in its own process on fire-and-forget UDP — a stall or a crash in the
+display can never add latency to the 30 Hz control loop.
+
+The lap times shown are real, from a 480k-step run.
+
+<br clear="right">
+
+
 **Results on Monza** (RTX 4070, ~14 h total training): complete laps at
 **85.7 s** against the author's own 82.4 s — within about 4%. Sixty-plus
 completed laps, average speed 197 km/h, driving the full circuit including both
@@ -225,6 +247,7 @@ that cuts a corner teaches the agent that cutting is correct.
 | `train_sac.py` | the training loop |
 | `drive.py` | run a checkpoint, report lap times **and track limits** |
 | `plot_training.py` / `dashboard.py` | diagnostics |
+| `make_hero.py` | regenerate this README's figure from your own lap |
 
 ---
 

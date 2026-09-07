@@ -11,9 +11,14 @@ demos/
 # Track maps are built from your own recordings in about a minute.
 maps/
 
-# Generated figures and captures.
+# Generated figures and captures -- these are regenerated from your own
+# recordings, so they are not worth versioning...
 docs/*.png
-docs/render_preview.png
+
+# ...except the README's images, which have to be in the repo to render on
+# GitHub. Regenerate with tools/make_hero.py against one of your own laps.
+!docs/hero.png
+!docs/hud.png
 
 # Python
 .venv/
