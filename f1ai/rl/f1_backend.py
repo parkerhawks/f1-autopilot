@@ -139,6 +139,8 @@ class F1Backend:
     # reference for where the car sits relative to the road.
     #
     # Re-run tune_crop.py if the camera, resolution or window size changes.
+    # These are only DEFAULTS -- every tool takes --crop-top / --crop-frac, so
+    # a different setup never requires editing source.
     def __init__(self, capture_region: tuple[int, int, int, int] | None = None,
                  crop_frac: float = 0.26, crop_top: float = 0.38,
                  reset_sequence: ResetSequence | None = None,

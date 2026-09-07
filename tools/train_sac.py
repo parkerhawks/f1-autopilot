@@ -134,6 +134,11 @@ def main() -> None:
                     help="'f1' drives the real game via capture + pad")
     ap.add_argument("--track", dest="map", default="track",
                     help="f1 only: curvature map for the preview features")
+    ap.add_argument("--crop-top", type=float, default=0.38,
+                    help="top of the crop as a fraction of frame height; "
+                         "find it with tools/tune_crop.py")
+    ap.add_argument("--crop-frac", type=float, default=0.26,
+                    help="crop height as a fraction of frame height")
     ap.add_argument("--region", default=None,
                     help="f1 only: left,top,right,bottom capture region")
     ap.add_argument("--delay-ms", type=float, default=0.0,
@@ -179,7 +184,8 @@ def main() -> None:
         if _map_file and _map_file.exists():
             from f1ai.rl.track_map import TrackMap as _TM
             _tm = _TM.load(_map_file)
-        backend = F1Backend(capture_region=region, track_map=_tm)
+        backend = F1Backend(capture_region=region, track_map=_tm,
+                            crop_top=a.crop_top, crop_frac=a.crop_frac)
         backend.restart_every = a.restart_every
         print(f"reset policy: "
               + ("always Restart Lap" if a.restart_every <= 1 else

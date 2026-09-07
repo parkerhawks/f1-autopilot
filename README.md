@@ -190,6 +190,18 @@ and the vanishing point inside it — no wheel, no HUD, nothing outside the game
 window. **Do not skip this.** No amount of training fixes a camera pointed at
 the wrong thing.
 
+Adjust until it looks right:
+
+```powershell
+.venv\Scripts\python.exe tools\tune_crop.py --delay 12 --samples 5 --crop-top 0.34 --crop-frac 0.30
+```
+
+The defaults suit a 2560x1369 window with a cockpit camera. A different
+resolution or camera will need different values — pass whatever you settle on
+to `record_laps.py`, `train_sac.py` and `drive.py` with the same two flags. No
+source editing required, but **they must match across all three**, or the
+policy trains on one framing and drives with another.
+
 ### 4. Record laps and build the map
 
 ```powershell

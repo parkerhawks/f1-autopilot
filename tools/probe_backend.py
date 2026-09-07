@@ -1,4 +1,4 @@
-"""Pre-flight check for F1Backend: capture + telemetry + pad, all at once.
+﻿"""Pre-flight check for F1Backend: capture + telemetry + pad, all at once.
 
 Every piece has been verified in isolation. Nothing has yet run them together
 against the live game, and that is where the interesting failures live -- a
@@ -38,6 +38,11 @@ def main() -> None:
     ap.add_argument("--seconds", type=float, default=20.0)
     ap.add_argument("--drive", action="store_true",
                     help="apply throttle and steering (game must have focus)")
+    ap.add_argument("--crop-top", type=float, default=0.38,
+                    help="top of the crop as a fraction of frame height; "
+                         "find it with tools/tune_crop.py")
+    ap.add_argument("--crop-frac", type=float, default=0.26,
+                    help="crop height as a fraction of frame height")
     ap.add_argument("--region", default=None,
                     help="left,top,right,bottom to capture a window region")
     a = ap.parse_args()
@@ -48,7 +53,8 @@ def main() -> None:
 
     print("opening capture + telemetry + virtual pad...")
     try:
-        backend = F1Backend(capture_region=region)
+        backend = F1Backend(capture_region=region,
+                             crop_top=a.crop_top, crop_frac=a.crop_frac)
     except RuntimeError as e:
         print(f"\nFAILED: {e}")
         sys.exit(1)

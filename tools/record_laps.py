@@ -1,4 +1,4 @@
-"""Record your own laps, to warm-start the policy before RL touches it.
+﻿"""Record your own laps, to warm-start the policy before RL touches it.
 
     python tools/record_laps.py --laps 5
 
@@ -38,6 +38,11 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--laps", type=int, default=5, help="laps to record")
     ap.add_argument("--name", default=None, help="session name")
+    ap.add_argument("--crop-top", type=float, default=0.38,
+                    help="top of the crop as a fraction of frame height; "
+                         "find it with tools/tune_crop.py")
+    ap.add_argument("--crop-frac", type=float, default=0.26,
+                    help="crop height as a fraction of frame height")
     ap.add_argument("--region", default=None)
     ap.add_argument("--max-minutes", type=float, default=20.0)
     a = ap.parse_args()
@@ -50,7 +55,8 @@ def main() -> None:
     out.mkdir(parents=True, exist_ok=True)
 
     print("opening capture + telemetry (no virtual pad -- you are driving)")
-    backend = F1Backend(capture_region=region, create_pad=False)
+    backend = F1Backend(capture_region=region, create_pad=False,
+                         crop_top=a.crop_top, crop_frac=a.crop_frac)
     print("ready.\n")
     print("Drive normally. Recording starts when you cross the line.")
     print("Ctrl-C to stop early.\n")
