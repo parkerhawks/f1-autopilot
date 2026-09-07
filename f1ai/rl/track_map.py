@@ -250,6 +250,14 @@ def build_from_laps(lap_files: list[Path], bin_metres: float = 5.0,
 
         # Below walking pace the curvature estimate explodes and means nothing.
         ok = speed > 8.0
+
+        # Drop the out-lap. A recording that begins in the garage reports a
+        # NEGATIVE lapDistance until the car crosses the line, and binning is
+        # done by that value -- every one of those samples lands in bin 0 and
+        # drags the start/finish position toward the pit lane. On a Las Vegas
+        # recording the out-lap ran from -6144 m, so it would have contributed
+        # a whole pit exit to the first five metres of the racing line.
+        ok &= dist >= 0.0
         if ok.sum() < 100:
             print(f"  skip {path.name}: too little motion")
             continue

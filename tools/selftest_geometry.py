@@ -69,13 +69,23 @@ def main() -> None:
         checks.append((f"survives lapDistance {label}", off < 2.0,
                        f"{off:.2f} m (would have been hundreds)"))
 
-    # A genuinely displaced car must still be reported as displaced, or the
-    # global fallback has simply disabled enforcement.
+    # Displace along the track's NORMAL, not along a fixed world axis.
+    #
+    # Pushing the point +15 m in world X only tests anything if the track
+    # happens to run across X there. At Monza's straightest point it did; at
+    # Las Vegas that straight runs along X, so the same test was moving the car
+    # 15 m FORWARDS down the road and then complaining that the road was 1 m
+    # away. The code was right and the test was measuring the wrong direction.
+    nxt = (straight + 1) % n
+    tx, tz = float(m.x[nxt] - m.x[straight]), float(m.z[nxt] - m.z[straight])
+    tlen = (tx * tx + tz * tz) ** 0.5 or 1.0
+    nx, nz = -tz / tlen, tx / tlen          # unit normal to the racing line
+
     for d in (15.0, 30.0, 60.0):
-        off = m.lateral_offset(px + d, pz, ps)
+        off = m.lateral_offset(px + nx * d, pz + nz * d, ps)
         ok = abs(off - d) < max(4.0, d * 0.25)
-        checks.append((f"a real {d:.0f} m displacement is still detected", ok,
-                       f"reported {off:.1f} m"))
+        checks.append((f"a real {d:.0f} m sideways displacement is detected",
+                       ok, f"reported {off:.1f} m"))
 
     # And every demonstration point must stay well inside the threshold.
     laps = sorted(Path("demos").glob("laps-*/*.npz"))

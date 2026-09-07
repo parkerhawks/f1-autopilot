@@ -86,7 +86,18 @@ def build_dataset(lap_files: list[Path], delay_steps: int,
         # Valid indices need `FRAME_STACK-1` frames of history behind them and
         # `delay_steps` of future ahead for the shifted label.
         lo, hi = FRAME_STACK - 1, n - delay_steps
+
+        # Skip the out-lap. A recording that starts in the garage reports a
+        # NEGATIVE lapDistance until the car crosses the line, and those frames
+        # are the pit lane -- training on them teaches the policy to drive down
+        # it, which is exactly the behaviour that has to be unlearned later.
+        on_track = d["lap_distance"] >= 0.0
+        skipped_outlap = 0
+
         for t in range(lo, hi):
+            if not on_track[t]:
+                skipped_outlap += 1
+                continue
             stack = d["frame"][t - FRAME_STACK + 1:t + 1]
 
             # Commanded-action history is not recorded -- the human's raw stick
@@ -126,7 +137,10 @@ def build_dataset(lap_files: list[Path], delay_steps: int,
             all_actions.append(_to_network_action(applied[t + delay_steps]))
 
         kept += 1
-        print(f"  keep {path.name}: {hi - lo} samples, {clean:.0%} clean")
+        note = (f", {skipped_outlap} out-lap frames dropped"
+                if skipped_outlap else "")
+        print(f"  keep {path.name}: {hi - lo - skipped_outlap} samples, "
+              f"{clean:.0%} clean{note}")
 
     if not all_frames:
         raise SystemExit("no usable laps -- lower --min-clean or record more")

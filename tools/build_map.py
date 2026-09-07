@@ -69,6 +69,12 @@ def main() -> None:
                 if "world_x" not in z.files:
                     continue
                 wx, wz, ld = z["world_x"], z["world_z"], z["lap_distance"]
+            # Measure the SAME points the map was built from. Including the
+            # out-lap here reported 35.7 m of deviation on laps that were
+            # actually within 7 m of each other -- the pit lane really is that
+            # far from the racing line, and it was never part of the map.
+            keep = ld >= 0.0
+            wx, wz, ld = wx[keep], wz[keep], ld[keep]
             spread += [tmap.lateral_offset(float(wx[i]), float(wz[i]),
                                            float(ld[i]))
                        for i in range(0, len(wx), 25)]
