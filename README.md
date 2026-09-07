@@ -81,12 +81,29 @@ Full tour: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 git clone https://github.com/<you>/f1-autopilot
 cd f1-autopilot
 python -m venv .venv
+```
+
+**Install PyTorch with CUDA first.** A plain `pip install torch` can give you a
+CPU-only build on Windows, and training is unusably slow on CPU — a gradient
+step goes from ~30 ms to several seconds. Install from PyTorch's own index:
+
+```powershell
+.venv\Scripts\python.exe -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+```
+
+Then the rest:
+
+```powershell
 .venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+```powershell
 .venv\Scripts\python.exe -m pip install vgamepad
 ```
 
-Install `vgamepad` separately and deliberately — it installs the ViGEmBus
-kernel driver and raises a UAC prompt.
+`vgamepad` is installed separately and deliberately — it sets up the ViGEmBus
+kernel driver and raises a UAC prompt. It is only needed to *control* the game;
+recording laps, the simulator and the whole test suite work without it.
 
 **Always install through `.venv\Scripts\python.exe -m pip`, never bare `pip`.**
 Bare `pip` resolves to the system Python and the package lands somewhere the

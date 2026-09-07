@@ -1,5 +1,9 @@
 # Game day: first session with F1 25
 
+The verification pass to run once, before any training. The
+[quickstart](../README.md) is the everyday path; this is the deeper check that
+each layer actually works on your machine.
+
 Ordered so each step gates the next. If one fails, stop and fix it — the later
 steps assume the earlier ones.
 
@@ -34,7 +38,7 @@ Then set:
 |---|---|---|
 | Display mode | **borderless windowed** | exclusive fullscreen blocks both capture and the overlay |
 | Resolution | 1920×1080 | halves preprocessing vs 1440p (measured: 3.9 ms → ~2 ms) |
-| Frame cap | 60 | leaves GPU headroom for inference |
+| Frame cap | **30-60** | anything above the 30 Hz control rate is wasted, and it competes with the learner. Measured: gradient steps went from 302 ms to 27 ms once the game stopped monopolising the GPU |
 | V-Sync | off | adds input latency |
 | Motion blur | **off** | blur corrupts training frames |
 | Preset | medium/low | simpler visuals help the CNN and cut contention |
@@ -141,16 +145,29 @@ gamepad input the instant it loses focus.
 
 ---
 
-## What to report back
+## Numbers worth writing down
 
-- packet sizes from step 1, and whether `--decode` tracked correctly
-- median latency from step 2
-- **the fastest reliable reset method and its time** — the most important number
-- capture + inference timings with the game running
+- packet sizes from step 1, and whether `--decode` tracked what you did
+- median control latency, split into transport and steering ramp
+- **the fastest reliable reset method and its time** — this sets what an
+  overnight run can achieve more than anything else
+- capture and inference timings with the game running
 
-## What is still unbuilt
+## Then
 
-- **Async actor/learner.** The loop is synchronous because the mock outruns
-  real time. F1 25 will not pause for a gradient step.
-- **The recorder** for behavioural-cloning warm start from your own laps.
-- `f1_backend.py` has never run. Expect the first failures there.
+Once every step above passes, go back to the [quickstart](../README.md) and
+carry on from "Record laps and build the map". Everything from there —
+recording, the map, behavioural cloning, the async learner, automated
+resets — is built and tested.
+
+Reference figures measured on an RTX 4070 at Monza, for comparison:
+
+| | measured |
+|---|---|
+| control latency | 18 ms transport + 82 ms steering ramp |
+| screen capture | 2.5 ms grab + 3.9 ms preprocess at 1440p |
+| gradient step | ~30 ms when the game is not fighting for the GPU |
+| reset | ~5 s including braking to a stop |
+
+If your latency or capture is far worse than these, fix that before training
+rather than after.

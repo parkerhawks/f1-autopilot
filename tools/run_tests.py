@@ -44,6 +44,38 @@ SUITES = [
 ]
 
 
+def _report_environment() -> None:
+    """Say what is installed, and warn about the setup mistakes that matter.
+
+    A CPU-only PyTorch is the expensive one: everything imports, every test
+    passes, and training is simply unusable -- a gradient step goes from about
+    30 ms to several seconds, so a run that should take an evening takes a
+    fortnight. It is worth one line at the top of the test output rather than
+    being discovered eight hours in.
+    """
+    print(f"python {sys.version.split()[0]}")
+    try:
+        import torch
+        if torch.cuda.is_available():
+            print(f"torch  {torch.__version__} on "
+                  f"{torch.cuda.get_device_name(0)}")
+        else:
+            print(f"torch  {torch.__version__}  *** NO CUDA ***")
+            print("       Training will be unusably slow. Reinstall with:")
+            print("       pip install torch torchvision --index-url "
+                  "https://download.pytorch.org/whl/cu124")
+    except ImportError:
+        print("torch  NOT INSTALLED -- see requirements.txt")
+
+    try:
+        import vgamepad  # noqa: F401
+        print("vgamepad installed (needed only to control the real game)")
+    except ImportError:
+        print("vgamepad not installed -- fine for the simulator and these "
+              "tests")
+    print()
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("filters", nargs="*",
@@ -61,6 +93,7 @@ def main() -> None:
         print("no suites matched")
         sys.exit(2)
 
+    _report_environment()
     print(f"running {len(selected)} suite(s)\n")
     results = []
     t_all = time.perf_counter()
