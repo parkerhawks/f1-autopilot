@@ -11,6 +11,17 @@ demos/
 # Track maps are built from your own recordings in about a minute.
 maps/
 
+# Database exports of your own training data (tools/export_db.py and
+# tools/load_db.py). Derived entirely from runs/ and demos/ above, so they
+# are regenerated in seconds and never belong in git.
+dbexport/
+*.db
+*.sqlite
+*.sqlite3
+
+# Coursework that happens to live here. Not part of the project.
+docs/proposal.html
+
 # Generated figures and captures -- these are regenerated from your own
 # recordings, so they are not worth versioning...
 docs/*.png

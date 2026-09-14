@@ -259,6 +259,7 @@ that cuts a corner teaches the agent that cutting is correct.
 | `train_sac.py` | the training loop |
 | `drive.py` | run a checkpoint, report lap times **and track limits** |
 | `plot_training.py` / `dashboard.py` | diagnostics |
+| `export_db.py` / `load_db.py` | every run, lap and track as eight related tables in SQLite, with a query suite that answers questions the file layout cannot: which corner loses the most time, which configuration produced the fastest lap |
 | `make_hero.py` | regenerate this README's figure from your own lap |
 
 ---
