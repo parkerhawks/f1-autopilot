@@ -19,13 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-This project is not affiliated with, endorsed by, or associated with
-Electronic Arts, Codemasters, or Formula One. "F1" and related marks belong to
-their respective owners. It reads the game's own documented UDP telemetry
-output and sends controller input through a virtual gamepad; it does not
-modify game files, read process memory, or interfere with the game in any way.
-
-See the "Fair use" section of README.md before running it.

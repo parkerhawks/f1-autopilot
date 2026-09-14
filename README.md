@@ -310,3 +310,7 @@ submission.
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+This project is not affiliated with, endorsed by, or associated with Electronic
+Arts, Codemasters, or Formula One. "F1" and related marks belong to their
+respective owners.
